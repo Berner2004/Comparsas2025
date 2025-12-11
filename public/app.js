@@ -17,21 +17,10 @@ const eventId = "2025";
 
 const cardsContainer = document.getElementById('cards-container');
 
-// Referencias al Modal
-const modalOverlay = document.getElementById('modal-overlay');
-const closeModalBtn = document.querySelector('.close-modal');
-const modalGroupName = document.getElementById('modal-group-name');
-const modalScore = document.getElementById('modal-score');
-
-// Manejo del Modal (Cerrar)
-closeModalBtn.onclick = () => modalOverlay.classList.add('hidden');
-modalOverlay.onclick = (e) => { if (e.target === modalOverlay) modalOverlay.classList.add('hidden'); };
-
 // --- ESTADO LOCAL ---
 let participantesCache = {}; 
 let scoresCache = [];
-let totalJueces = 0; 
-let completedGroupsShown = new Set(); 
+let previousTop3String = "";
 
 function calcularYRenderizar() {
   // 1. Agrupar votos por Participante
@@ -41,12 +30,13 @@ function calcularYRenderizar() {
     grupos[p.id] = {
       id: p.id,
       nombre: p.nombre,
-      tipoBaile: p.tipoBaile, // Aseguramos que el tipo de baile pase al grupo
+      tipoBaile: p.tipoBaile,
       votos: [],
       total: 0
     };
   });
 
+  // Llenar votos
   scoresCache.forEach(score => {
     if (grupos[score.participantId]) {
       grupos[score.participantId].votos.push(score);
@@ -58,24 +48,24 @@ function calcularYRenderizar() {
     grupo.total = grupo.votos.reduce((sum, v) => sum + v.totalFinal, 0);
 
     // SECUENCIALIDAD: "Juez 1", "Juez 2"...
+    // Asigna el número según el orden en que llegaron al array
     grupo.votosFormateados = grupo.votos.map((voto, index) => ({
       etiqueta: `Juez ${index + 1}`,
       valor: voto.totalFinal
     }));
 
-    // LÓGICA DEL POPUP (MODAL)
-    if (totalJueces > 0 && grupo.votos.length === totalJueces) {
-      if (!completedGroupsShown.has(grupo.id)) {
-        mostrarModal(grupo.nombre, grupo.total);
-        completedGroupsShown.add(grupo.id);
-      }
-    }
-
     return grupo;
   });
 
   // 3. Ordenar
-  listaFinal.sort((a, b) => b.total - a.total);
+  // Animación Flash al cambiar el Top 3
+  const currentTop3Ids = listaFinal.slice(0, 3).map(p => p.id);
+  const currentTop3String = JSON.stringify(currentTop3Ids);
+  if (previousTop3String !== "" && previousTop3String !== currentTop3String && listaFinal.length > 0) {
+      cardsContainer.classList.add('animate-update');
+      setTimeout(() => cardsContainer.classList.remove('animate-update'), 1200);
+  }
+  previousTop3String = currentTop3String;
 
   // 4. Renderizar HTML
   cardsContainer.innerHTML = "";
@@ -88,12 +78,13 @@ function calcularYRenderizar() {
   listaFinal.forEach((p, index) => {
     let rankClass = index === 0 ? "rank-1" : index === 1 ? "rank-2" : index === 2 ? "rank-3" : "";
 
-    // --- GENERAR HTML DEL GRÁFICO VERTICAL ---
+    // GENERAR HTML DEL GRÁFICO VERTICAL
     let graficoHtml = "";
     if (p.votosFormateados.length > 0) {
       graficoHtml = `<div class="chart-container-vertical">`;
       p.votosFormateados.forEach(v => {
         // Cálculo del porcentaje (altura)
+        // Ajusta el denominador (10 o 100) según tu escala de notas
         let porcentaje = Math.min((v.valor / 10) * 100, 100);
         if(v.valor > 10) porcentaje = Math.min((v.valor / 100) * 100, 100);
 
@@ -115,7 +106,6 @@ function calcularYRenderizar() {
     const card = document.createElement("div");
     card.className = `card ${rankClass}`;
     
-    // AQUÍ INCLUIMOS EL TIPO DE BAILE
     card.innerHTML = `
       <div class="card-title">${p.nombre}</div>
       <div class="dance-type">🎭 ${p.tipoBaile}</div>
@@ -130,21 +120,9 @@ function calcularYRenderizar() {
   });
 }
 
-function mostrarModal(nombre, puntaje) {
-  modalGroupName.innerText = nombre;
-  modalScore.innerText = puntaje.toFixed(2);
-  modalOverlay.classList.remove('hidden');
-}
-
 // --- LISTENERS ---
 
-// 1. Contar Jueces
-onSnapshot(collection(db, `events/${eventId}/judges`), (snap) => {
-  totalJueces = snap.size;
-  calcularYRenderizar();
-});
-
-// 2. Participantes (Capturando tipoBaile)
+// 2. Participantes
 onSnapshot(collection(db, `events/${eventId}/participants`), (snap) => {
   participantesCache = {}; 
   snap.forEach(doc => {
@@ -152,7 +130,6 @@ onSnapshot(collection(db, `events/${eventId}/participants`), (snap) => {
     participantesCache[doc.id] = { 
       id: doc.id, 
       nombre: data.nombre || data.participantNombre || "Sin nombre",
-      // Capturamos el tipo de baile (o ponemos un default)
       tipoBaile: data.tipoBaile || data.danceType || "Danza" 
     };
   });
