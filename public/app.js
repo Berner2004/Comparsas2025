@@ -30,57 +30,51 @@ modalOverlay.onclick = (e) => { if (e.target === modalOverlay) modalOverlay.clas
 // --- ESTADO LOCAL ---
 let participantesCache = {}; 
 let scoresCache = [];
-let totalJueces = 0; // Se actualiza dinámicamente desde Firebase
-let completedGroupsShown = new Set(); // Para no repetir el popup si ya se mostró
+let totalJueces = 0; 
+let completedGroupsShown = new Set(); 
 
 function calcularYRenderizar() {
   // 1. Agrupar votos por Participante
   let grupos = {};
 
-  // Inicializar grupos con la info de participantes
   Object.values(participantesCache).forEach(p => {
     grupos[p.id] = {
       id: p.id,
       nombre: p.nombre,
-      tipoBaile: p.tipoBaile,
-      votos: [], // Aquí guardaremos los objetos score
+      tipoBaile: p.tipoBaile, // Aseguramos que el tipo de baile pase al grupo
+      votos: [],
       total: 0
     };
   });
 
-  // Llenar votos
   scoresCache.forEach(score => {
     if (grupos[score.participantId]) {
       grupos[score.participantId].votos.push(score);
     }
   });
 
-  // 2. Procesar cada grupo para generar la lista final
+  // 2. Procesar grupos
   let listaFinal = Object.values(grupos).map(grupo => {
-    // Calcular Total
     grupo.total = grupo.votos.reduce((sum, v) => sum + v.totalFinal, 0);
 
-    // SECUENCIALIDAD: "Juez 1", "Juez 2"... basado en el orden de llegada
-    // (Asumimos que el array se llena en orden de llegada desde Firebase)
+    // SECUENCIALIDAD: "Juez 1", "Juez 2"...
     grupo.votosFormateados = grupo.votos.map((voto, index) => ({
       etiqueta: `Juez ${index + 1}`,
       valor: voto.totalFinal
     }));
 
-    // --- LÓGICA DEL POPUP ---
-    // Si tenemos jueces definidos (>0) y la cantidad de votos es igual al total de jueces...
+    // LÓGICA DEL POPUP (MODAL)
     if (totalJueces > 0 && grupo.votos.length === totalJueces) {
-      // Y si no hemos mostrado este popup antes...
       if (!completedGroupsShown.has(grupo.id)) {
         mostrarModal(grupo.nombre, grupo.total);
-        completedGroupsShown.add(grupo.id); // Marcamos para no repetir
+        completedGroupsShown.add(grupo.id);
       }
     }
 
     return grupo;
   });
 
-  // 3. Ordenar por puntaje (Mayor a Menor)
+  // 3. Ordenar
   listaFinal.sort((a, b) => b.total - a.total);
 
   // 4. Renderizar HTML
@@ -94,33 +88,34 @@ function calcularYRenderizar() {
   listaFinal.forEach((p, index) => {
     let rankClass = index === 0 ? "rank-1" : index === 1 ? "rank-2" : index === 2 ? "rank-3" : "";
 
-    // Generar HTML del Gráfico de Barras Horizontal
+    // --- GENERAR HTML DEL GRÁFICO VERTICAL ---
     let graficoHtml = "";
     if (p.votosFormateados.length > 0) {
-      graficoHtml = `<div class="chart-container">`;
+      graficoHtml = `<div class="chart-container-vertical">`;
       p.votosFormateados.forEach(v => {
-        // Cálculo del ancho de la barra (sobre 10 o 100)
+        // Cálculo del porcentaje (altura)
         let porcentaje = Math.min((v.valor / 10) * 100, 100);
         if(v.valor > 10) porcentaje = Math.min((v.valor / 100) * 100, 100);
 
         graficoHtml += `
-          <div class="chart-row">
-            <div class="chart-label">${v.etiqueta}</div>
-            <div class="chart-bar-bg">
-              <div class="chart-bar-fill" style="width: ${porcentaje}%;"></div>
+          <div class="chart-column">
+            <div class="chart-value-vertical">${v.valor}</div>
+            <div class="chart-bar-bg-vertical">
+              <div class="chart-bar-fill-vertical" style="height: ${porcentaje}%;"></div>
             </div>
-            <div class="chart-value">${v.valor}</div>
+            <div class="chart-label-vertical">${v.etiqueta}</div>
           </div>
         `;
       });
       graficoHtml += `</div>`;
     } else {
-      graficoHtml = `<div style="color:#999; font-size:0.8em; margin:15px 0;">Esperando inicio de votación...</div>`;
+      graficoHtml = `<div style="color:#999; font-size:0.8em; margin:15px 0; min-height:150px; display:flex; align-items:center; justify-content:center;">Esperando inicio de votación...</div>`;
     }
 
     const card = document.createElement("div");
     card.className = `card ${rankClass}`;
     
+    // AQUÍ INCLUIMOS EL TIPO DE BAILE
     card.innerHTML = `
       <div class="card-title">${p.nombre}</div>
       <div class="dance-type">🎭 ${p.tipoBaile}</div>
@@ -135,7 +130,6 @@ function calcularYRenderizar() {
   });
 }
 
-// Función para mostrar el Popup
 function mostrarModal(nombre, puntaje) {
   modalGroupName.innerText = nombre;
   modalScore.innerText = puntaje.toFixed(2);
@@ -144,13 +138,13 @@ function mostrarModal(nombre, puntaje) {
 
 // --- LISTENERS ---
 
-// 1. Contar Jueces (Vital para saber cuándo mostrar el popup)
+// 1. Contar Jueces
 onSnapshot(collection(db, `events/${eventId}/judges`), (snap) => {
   totalJueces = snap.size;
   calcularYRenderizar();
 });
 
-// 2. Participantes
+// 2. Participantes (Capturando tipoBaile)
 onSnapshot(collection(db, `events/${eventId}/participants`), (snap) => {
   participantesCache = {}; 
   snap.forEach(doc => {
@@ -158,6 +152,7 @@ onSnapshot(collection(db, `events/${eventId}/participants`), (snap) => {
     participantesCache[doc.id] = { 
       id: doc.id, 
       nombre: data.nombre || data.participantNombre || "Sin nombre",
+      // Capturamos el tipo de baile (o ponemos un default)
       tipoBaile: data.tipoBaile || data.danceType || "Danza" 
     };
   });

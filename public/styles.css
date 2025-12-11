@@ -15,8 +15,6 @@ body {
   color: var(--text-color);
   min-height: 100vh;
   overflow-x: hidden;
-
-  /* Fondo ESPOCH con superposición */
   background: 
     linear-gradient(to bottom, rgba(255, 255, 255, 0.9) 0%, rgba(230, 240, 255, 0.8) 100%),
     url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Entrada_Principal_ESPOCH.jpg/1280px-Entrada_Principal_ESPOCH.jpg') no-repeat center center fixed;
@@ -90,6 +88,7 @@ h1 {
   margin-top: 10px;
 }
 
+/* --- ESTILO PARA EL TIPO DE DANZA --- */
 .dance-type {
   font-size: 0.9em;
   color: var(--secondary-color);
@@ -103,49 +102,58 @@ h1 {
   display: inline-block;
 }
 
-/* --- GRÁFICO DE BARRAS HORIZONTALES --- */
-.chart-container {
-  width: 100%;
-  margin-bottom: 20px;
-  padding: 0 10px;
-}
-
-.chart-row {
+/* --- GRÁFICO DE BARRAS VERTICALES --- */
+.chart-container-vertical {
   display: flex;
+  justify-content: center; 
+  gap: 15px; 
+  align-items: flex-end; 
+  height: 150px; 
+  margin-bottom: 25px;
+  padding-top: 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.05); 
+}
+
+.chart-column {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 8px; /* Espacio entre jueces */
-  font-size: 0.9em;
-}
-
-.chart-label {
-  width: 25%; /* Espacio para "Juez 1" */
-  text-align: left;
-  font-weight: 700;
-  color: #555;
-  white-space: nowrap;
-}
-
-.chart-bar-bg {
-  flex-grow: 1; /* Ocupa todo el espacio disponible */
-  background: var(--bar-bg);
-  border-radius: 10px;
-  height: 12px;
-  margin: 0 10px;
-  overflow: hidden;
-}
-
-.chart-bar-fill {
-  background: linear-gradient(90deg, var(--secondary-color), #27ae60);
+  justify-content: flex-end;
   height: 100%;
-  border-radius: 10px;
-  transition: width 0.6s ease-out; /* Animación suave al crecer */
+  width: 45px;
 }
 
-.chart-value {
-  width: 40px;
-  text-align: right;
+.chart-value-vertical {
   font-weight: 900;
   color: var(--primary-color);
+  font-size: 0.9em;
+  margin-bottom: 5px;
+}
+
+.chart-bar-bg-vertical {
+  width: 18px; 
+  height: 100%; 
+  background: var(--bar-bg);
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end; 
+}
+
+.chart-bar-fill-vertical {
+  width: 100%;
+  background: linear-gradient(to top, var(--secondary-color), #2ecc71);
+  border-radius: 10px 10px 0 0;
+  transition: height 0.6s ease-out; 
+}
+
+.chart-label-vertical {
+  font-size: 0.75em;
+  font-weight: 700;
+  color: #555;
+  margin-top: 8px;
+  text-align: center;
+  white-space: nowrap;
 }
 
 /* --- TOTALES --- */
@@ -165,68 +173,31 @@ h1 {
   text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
 }
 
-/* --- VENTANA EMERGENTE (MODAL) --- */
+/* --- MODAL --- */
 .hidden { display: none !important; }
-
 #modal-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  backdrop-filter: blur(5px);
-  animation: fadeIn 0.3s;
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.8); z-index: 1000;
+  display: flex; justify-content: center; align-items: center;
+  backdrop-filter: blur(5px); animation: fadeIn 0.3s;
 }
-
 .modal-content {
-  background: white;
-  padding: 40px;
-  border-radius: 20px;
-  text-align: center;
-  width: 90%;
-  max-width: 500px;
-  position: relative;
-  border-top: 10px solid var(--gold-color);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: white; padding: 40px; border-radius: 20px; text-align: center; width: 90%; max-width: 500px;
+  position: relative; border-top: 10px solid var(--gold-color);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: popIn 0.5s;
 }
-
-.close-modal {
-  position: absolute;
-  top: 10px; right: 20px;
-  font-size: 30px;
-  font-weight: bold;
-  color: #aaa;
-  cursor: pointer;
-}
-.close-modal:hover { color: var(--primary-color); }
-
+.close-modal { position: absolute; top: 10px; right: 20px; font-size: 30px; font-weight: bold; color: #aaa; cursor: pointer; }
 .modal-header { font-size: 1.5em; color: var(--secondary-color); font-weight: 900; margin-bottom: 20px; text-transform: uppercase; }
 .modal-group { font-size: 2em; color: #333; font-weight: 900; margin-bottom: 10px; line-height: 1.2; }
 .modal-label { font-size: 0.9em; text-transform: uppercase; color: #777; letter-spacing: 2px; }
 .modal-number { font-size: 5em; font-weight: 900; color: var(--primary-color); text-shadow: 3px 3px 0px #eee; margin: 10px 0; }
 .modal-footer { font-size: 0.9em; color: #999; font-style: italic; }
 
-/* --- QR y Títulos Centrados --- */
-#qr-text-container {
-  display: flex; justify-content: center; align-items: center; width: 100%;
-  margin-top: 50px; margin-bottom: 15px; position: relative; z-index: 10;
-}
-.qr-title {
-  font-family: 'Montserrat', sans-serif; font-weight: 900; color: var(--primary-color);
-  font-size: 1.6em; text-shadow: 2px 2px 0px #fff; background-color: rgba(255,255,255,0.85);
-  padding: 10px 30px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center;
-}
-#qr-img-container {
-  display: flex; justify-content: center; width: 100%; margin-bottom: 80px; position: relative; z-index: 10;
-}
-.qr-image {
-  background-color: white; padding: 10px; border-radius: 25px;
-  box-shadow: 0 0 0 8px white, 0 0 0 15px var(--secondary-color), 0 20px 40px rgba(0,0,0,0.3);
-  transition: transform 0.3s;
-}
+/* --- QR --- */
+#qr-text-container { display: flex; justify-content: center; align-items: center; width: 100%; margin-top: 50px; margin-bottom: 15px; position: relative; z-index: 10; }
+.qr-title { font-family: 'Montserrat', sans-serif; font-weight: 900; color: var(--primary-color); font-size: 1.6em; text-shadow: 2px 2px 0px #fff; background-color: rgba(255,255,255,0.85); padding: 10px 30px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+#qr-img-container { display: flex; justify-content: center; width: 100%; margin-bottom: 80px; position: relative; z-index: 10; }
+.qr-image { background-color: white; padding: 10px; border-radius: 25px; box-shadow: 0 0 0 8px white, 0 0 0 15px var(--secondary-color), 0 20px 40px rgba(0,0,0,0.3); transition: transform 0.3s; }
 .qr-image:hover { transform: scale(1.1) rotate(3deg); cursor: pointer; }
 
 /* Animaciones */
