@@ -1,0 +1,247 @@
+/* --- Variables Navideñas --- */
+:root {
+  --primary-color: #C0392B; /* Rojo Navidad */
+  --secondary-color: #27AE60; /* Verde Pino */
+  --gold-color: #F1C40F;      /* Dorado */
+  --text-color: #2c3e50;
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --bar-bg: #e0e0e0;          /* Fondo gris para las barras */
+}
+
+/* --- ESTILOS GENERALES --- */
+body {
+  font-family: 'Montserrat', sans-serif;
+  padding: 40px;
+  color: var(--text-color);
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  /* Fondo ESPOCH con superposición */
+  background: 
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.9) 0%, rgba(230, 240, 255, 0.8) 100%),
+    url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Entrada_Principal_ESPOCH.jpg/1280px-Entrada_Principal_ESPOCH.jpg') no-repeat center center fixed;
+  background-size: cover;
+  background-blend-mode: normal; 
+}
+
+h1 {
+  font-size: 2.8em;
+  font-weight: 900;
+  color: var(--primary-color);
+  text-align: center;
+  text-shadow: 2px 2px 0px #fff;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #444;
+  margin-bottom: 40px;
+  font-weight: 700;
+  background-color: rgba(255,255,255,0.6);
+  display: inline-block;
+  padding: 5px 15px;
+  border-radius: 15px;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* --- GRID DE TARJETAS --- */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 25px;
+  width: 90%;
+  margin: 0 auto;
+  z-index: 10;
+  position: relative;
+}
+
+/* --- TARJETA --- */
+.card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 25px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-top: 5px solid var(--secondary-color);
+  animation: slideUp 0.5s ease-out forwards;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(192, 57, 43, 0.3);
+}
+
+.card.rank-1 { border-top: 8px solid var(--gold-color); background: linear-gradient(to bottom, #fffcf2, #fff); }
+.card.rank-2 { border-top: 8px solid #bdc3c7; }
+.card.rank-3 { border-top: 8px solid #d35400; }
+
+.card-title {
+  font-size: 1.4em;
+  font-weight: 900;
+  margin-bottom: 5px;
+  color: #333;
+  line-height: 1.2;
+  margin-top: 10px;
+}
+
+.dance-type {
+  font-size: 0.9em;
+  color: var(--secondary-color);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  background: rgba(39, 174, 96, 0.1);
+  padding: 5px 15px;
+  border-radius: 15px;
+  display: inline-block;
+}
+
+/* --- GRÁFICO DE BARRAS HORIZONTALES --- */
+.chart-container {
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+
+.chart-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px; /* Espacio entre jueces */
+  font-size: 0.9em;
+}
+
+.chart-label {
+  width: 25%; /* Espacio para "Juez 1" */
+  text-align: left;
+  font-weight: 700;
+  color: #555;
+  white-space: nowrap;
+}
+
+.chart-bar-bg {
+  flex-grow: 1; /* Ocupa todo el espacio disponible */
+  background: var(--bar-bg);
+  border-radius: 10px;
+  height: 12px;
+  margin: 0 10px;
+  overflow: hidden;
+}
+
+.chart-bar-fill {
+  background: linear-gradient(90deg, var(--secondary-color), #27ae60);
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.6s ease-out; /* Animación suave al crecer */
+}
+
+.chart-value {
+  width: 40px;
+  text-align: right;
+  font-weight: 900;
+  color: var(--primary-color);
+}
+
+/* --- TOTALES --- */
+.total-label {
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #888;
+  margin-top: 10px;
+}
+
+.total-number {
+  font-size: 3.5em;
+  font-weight: 900;
+  color: var(--primary-color);
+  line-height: 1;
+  text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+}
+
+/* --- VENTANA EMERGENTE (MODAL) --- */
+.hidden { display: none !important; }
+
+#modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s;
+}
+
+.modal-content {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  border-top: 10px solid var(--gold-color);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px; right: 20px;
+  font-size: 30px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
+.close-modal:hover { color: var(--primary-color); }
+
+.modal-header { font-size: 1.5em; color: var(--secondary-color); font-weight: 900; margin-bottom: 20px; text-transform: uppercase; }
+.modal-group { font-size: 2em; color: #333; font-weight: 900; margin-bottom: 10px; line-height: 1.2; }
+.modal-label { font-size: 0.9em; text-transform: uppercase; color: #777; letter-spacing: 2px; }
+.modal-number { font-size: 5em; font-weight: 900; color: var(--primary-color); text-shadow: 3px 3px 0px #eee; margin: 10px 0; }
+.modal-footer { font-size: 0.9em; color: #999; font-style: italic; }
+
+/* --- QR y Títulos Centrados --- */
+#qr-text-container {
+  display: flex; justify-content: center; align-items: center; width: 100%;
+  margin-top: 50px; margin-bottom: 15px; position: relative; z-index: 10;
+}
+.qr-title {
+  font-family: 'Montserrat', sans-serif; font-weight: 900; color: var(--primary-color);
+  font-size: 1.6em; text-shadow: 2px 2px 0px #fff; background-color: rgba(255,255,255,0.85);
+  padding: 10px 30px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center;
+}
+#qr-img-container {
+  display: flex; justify-content: center; width: 100%; margin-bottom: 80px; position: relative; z-index: 10;
+}
+.qr-image {
+  background-color: white; padding: 10px; border-radius: 25px;
+  box-shadow: 0 0 0 8px white, 0 0 0 15px var(--secondary-color), 0 20px 40px rgba(0,0,0,0.3);
+  transition: transform 0.3s;
+}
+.qr-image:hover { transform: scale(1.1) rotate(3deg); cursor: pointer; }
+
+/* Animaciones */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes snowFlash { 0% { filter: brightness(1); } 50% { filter: brightness(1.3); } 100% { filter: brightness(1); } }
+.animate-update { animation: snowFlash 1s ease-in-out; }
+.snowflake { position: fixed; top: -10px; z-index: 1; color: #d6eaf8; font-size: 1em; text-shadow: 0 0 5px #000; animation: fall linear infinite, sway ease-in-out infinite; }
+@keyframes fall { 0% { top: -10%; } 100% { top: 100%; } }
+@keyframes sway { 0% { transform: translateX(0px); } 50% { transform: translateX(50px); } 100% { transform: translateX(0px); } }
+
+/* Responsividad */
+@media (max-width: 768px) {
+  body { padding: 15px 10px; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .total-number { font-size: 3em; }
+}

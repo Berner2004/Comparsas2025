@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resultados Navideños – Concurso 2025</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div id="snow-container"></div>
+
+  <h1>🎅 Resultados Preliminares 🎄<br>Concurso Pase del Niño 2025</h1>
+  <p class="subtitle">❄️ Datos actualizados en tiempo real desde el Polo Norte ❄️</p>
+
+  <div id="cards-container" class="cards-grid">
+    <div style="width: 100%; text-align: center; color: white; font-size: 1.5em; padding: 40px;">
+      🎁 Cargando tarjetas mágicas...
+    </div>
+  </div>
+
+  <div id="qr-text-container">
+    <p class="qr-title">📱 ¡Escanea para seguir en vivo!</p>
+  </div>
+
+  <div id="qr-img-container">
+    <img class="qr-image" 
+         src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://closepath.onrender.com" 
+         alt="QR Code"
+         width="220" height="220">
+  </div>
+
+  <div id="modal-overlay" class="hidden">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <div class="modal-header">🎉 ¡Puntaje Completo! 🎉</div>
+      <div id="modal-group-name" class="modal-group">Nombre Comparsa</div>
+      <div class="modal-label">Puntaje Final Oficial</div>
+      <div id="modal-score" class="modal-number">00.00</div>
+      <div class="modal-footer">Todos los jueces han votado</div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+
+</body>
+</html>

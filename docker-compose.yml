@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  web:
+    build: .
+    image: comparsas-web:latest
+    container_name: comparsas
+    ports:
+      - "80:80"
+    restart: always
